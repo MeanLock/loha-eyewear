@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginDataDto } from './dto/login-response.dto';
-import { ApiEnvelopeResponse } from '../common/decorators/swagger.decorator';
+import { ApiEnvelopeResponse } from '../../common/decorators/swagger.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')

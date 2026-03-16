@@ -20,14 +20,6 @@ async function bootstrap() {
     await queryRunner.connect();
 
     try {
-        // 1. Product Statuses
-        console.log('Seeding ProductStatus...');
-        await queryRunner.manager.save(ProductStatus, [
-            { id: 1, name: 'draft' },
-            { id: 2, name: 'active' },
-            { id: 3, name: 'discontinued' },
-        ]);
-
         // 2. Shipment Statuses
         console.log('Seeding ShipmentStatus...');
         await queryRunner.manager.save(ShipmentStatus, [

@@ -3,13 +3,13 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiExtraMo
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PaginationDto } from '../common/dtos/pagination.dto';
+import { PaginationDto } from '../../common/dtos/pagination.dto';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
-import { AccountRole } from '../database/enums/account-role.enum';
-import { ApiEnvelopeResponse } from '../common/decorators/swagger.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { AccountRole } from '../../database/enums/account-role.enum';
+import { ApiEnvelopeResponse } from '../../common/decorators/swagger.decorator';
 import { ProductResponseDto } from './dto/product-response.dto';
 
 

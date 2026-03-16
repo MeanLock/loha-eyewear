@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AccountRole } from '../../database/enums/account-role.enum';
+import { AccountRole } from '../../../database/enums/account-role.enum';
 
 export class UserInfoDto {
     @ApiProperty({ format: 'uuid' })

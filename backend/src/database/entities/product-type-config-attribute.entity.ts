@@ -32,6 +32,9 @@ export class ProductTypeConfigAttribute {
   @Column({ type: 'int', default: 0 })
   sort_order: number;
 
+  @Column({ type: 'jsonb', nullable: true })
+  validation_rules: Record<string, any>;
+
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 

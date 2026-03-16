@@ -4,7 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Account } from '../../database/entities';
+import { Account } from '../../../database/entities';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()
