@@ -7,6 +7,9 @@ import { AppService } from './app.service';
 import { ProductsModule } from './modules/products/products.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProductStatusesModule } from './modules/product-statuses/product-statuses.module';
+import { ProductTypesModule } from './modules/product-types/product-types.module';
+import { ProductTypeConfigAttributesModule } from './modules/product-type-config-attributes/product-type-config-attributes.module';
+import { ProductEnumAttributeOptionsModule } from './modules/product-enum-attribute-options/product-enum-attribute-options.module';
 
 @Module({
   imports: [
@@ -33,6 +36,9 @@ import { ProductStatusesModule } from './modules/product-statuses/product-status
     ProductsModule,
     AuthModule,
     ProductStatusesModule,
+    ProductTypesModule,
+    ProductTypeConfigAttributesModule,
+    ProductEnumAttributeOptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

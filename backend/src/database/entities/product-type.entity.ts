@@ -26,6 +26,8 @@ export class ProductType {
   @OneToMany(() => Product, (p) => p.product_type)
   products: Product[];
 
-  @OneToMany(() => ProductTypeConfigAttribute, (a) => a.product_type)
+  @OneToMany(() => ProductTypeConfigAttribute, (a) => a.product_type, {
+    cascade: true
+  })
   config_attributes: ProductTypeConfigAttribute[];
 }

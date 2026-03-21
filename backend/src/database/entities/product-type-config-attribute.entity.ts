@@ -11,6 +11,7 @@ import {
 import { ProductType } from './product-type.entity';
 import { ProductEnumAttributeOption } from './product-enum-attribute-option.entity';
 import { AttributeDataType } from '../enums';
+import { type ValidationRules } from 'src/modules/product-type-config-attributes/types/validation-rules.type';
 
 @Entity('product_type_config_attributes')
 export class ProductTypeConfigAttribute {
@@ -23,6 +24,9 @@ export class ProductTypeConfigAttribute {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
+  @Column({type: "varchar", length: 50})
+  key: string;
+
   @Column({ type: 'varchar', length: 20 })
   data_type: AttributeDataType;
 
@@ -33,7 +37,7 @@ export class ProductTypeConfigAttribute {
   sort_order: number;
 
   @Column({ type: 'jsonb', nullable: true })
-  validation_rules: Record<string, any>;
+  validation_rules: ValidationRules;
 
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
@@ -45,6 +49,8 @@ export class ProductTypeConfigAttribute {
   @JoinColumn({ name: 'product_type_id' })
   product_type: ProductType;
 
-  @OneToMany(() => ProductEnumAttributeOption, (o) => o.attribute)
+  @OneToMany(() => ProductEnumAttributeOption, (o) => o.attribute, {
+    cascade: true
+  })
   enum_options: ProductEnumAttributeOption[];
 }
