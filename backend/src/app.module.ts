@@ -10,6 +10,7 @@ import { ProductStatusesModule } from './modules/product-statuses/product-status
 import { ProductTypesModule } from './modules/product-types/product-types.module';
 import { ProductTypeConfigAttributesModule } from './modules/product-type-config-attributes/product-type-config-attributes.module';
 import { ProductEnumAttributeOptionsModule } from './modules/product-enum-attribute-options/product-enum-attribute-options.module';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ProductEnumAttributeOptionsModule } from './modules/product-enum-attrib
     ProductTypesModule,
     ProductTypeConfigAttributesModule,
     ProductEnumAttributeOptionsModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

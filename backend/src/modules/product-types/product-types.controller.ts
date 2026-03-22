@@ -8,9 +8,9 @@ import { ProductTypesService } from './product-types.service';
 import { CreateProductTypeDto } from './dto/create-product-type.dto';
 
 @ApiTags('Product Types')
-@ApiBearerAuth('JWT-auth')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(AccountRole.ADMIN)
+// @ApiBearerAuth('JWT-auth')
+// @UseGuards(JwtAuthGuard, RolesGuard)
+// @Roles(AccountRole.ADMIN)
 @Controller('product-types')
 export class ProductTypesController {
     constructor(private readonly productTypesService: ProductTypesService) { }
