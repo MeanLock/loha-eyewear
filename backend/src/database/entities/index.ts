@@ -14,6 +14,7 @@ export { ProductImage } from './product-image.entity';
 // Eyewear specifics
 export { FrameDetail } from './frame-detail.entity';
 export { LensDetail } from './lens-detail.entity';
+export { EyePrescription } from './eye-prescription.entity';
 
 // Suppliers & Inventory
 export { Supplier } from './supplier.entity';

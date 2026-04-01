@@ -15,18 +15,9 @@ export class Account {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  // ── Primary lookup key ──
   @Index({ unique: true })
-  @Column({ type: 'varchar', length: 50, unique: true })
-  username: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  password_hash: string;
-
-  @Index({ unique: true })
-  @Column({ type: 'varchar', length: 255, unique: true })
-  email: string;
-
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, unique: true })
   phone: string;
 
   @Column({ type: 'varchar', length: 255 })
@@ -35,6 +26,19 @@ export class Account {
   @Column({ type: 'date', nullable: true })
   dob: Date;
 
+  // ── Optional credentials (nullable cho guest / chỉ-phone flow) ──
+  @Index({ unique: true })
+  @Column({ type: 'varchar', length: 50, unique: true, nullable: true })
+  username: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  password_hash: string;
+
+  @Index({ unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+  email: string;
+
+  // ── Profile ──
   @Column({ type: 'varchar', length: 10, nullable: true })
   gender: string;
 

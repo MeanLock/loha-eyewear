@@ -14,6 +14,7 @@ import { OrderStatus } from './order-status.entity';
 import { PaymentMethod } from './payment-method.entity';
 import { VatConfig } from './vat-config.entity';
 import { OrderItem } from './order-item.entity';
+import { EyePrescription } from './eye-prescription.entity';
 
 @Entity('orders')
 export class Order {
@@ -39,6 +40,10 @@ export class Order {
 
   @Column({ type: 'text', nullable: true })
   shipping_address: string;
+
+  // ── Liên kết đơn đo mắt ──
+  @Column({ type: 'uuid', nullable: true })
+  prescription_id: string;
 
   @Index()
   @Column({ type: 'int', default: 1 })
@@ -84,6 +89,10 @@ export class Order {
   @JoinColumn({ name: 'customer_id' })
   customer: Account;
 
+  @ManyToOne(() => EyePrescription)
+  @JoinColumn({ name: 'prescription_id' })
+  prescription: EyePrescription;
+
   @ManyToOne(() => OrderStatus)
   @JoinColumn({ name: 'status_id' })
   status: OrderStatus;
@@ -103,3 +112,4 @@ export class Order {
   @OneToMany(() => OrderItem, (oi) => oi.order)
   items: OrderItem[];
 }
+

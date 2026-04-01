@@ -11,6 +11,7 @@ import { ProductTypesModule } from './modules/product-types/product-types.module
 import { ProductTypeConfigAttributesModule } from './modules/product-type-config-attributes/product-type-config-attributes.module';
 import { ProductEnumAttributeOptionsModule } from './modules/product-enum-attribute-options/product-enum-attribute-options.module';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
+import { PrescriptionsModule } from './modules/prescriptions/prescriptions.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
     ProductTypeConfigAttributesModule,
     ProductEnumAttributeOptionsModule,
     CloudinaryModule,
+    PrescriptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
