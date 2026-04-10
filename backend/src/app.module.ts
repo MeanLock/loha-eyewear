@@ -12,6 +12,12 @@ import { ProductTypeConfigAttributesModule } from './modules/product-type-config
 import { ProductEnumAttributeOptionsModule } from './modules/product-enum-attribute-options/product-enum-attribute-options.module';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { PrescriptionsModule } from './modules/prescriptions/prescriptions.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { OrdersController } from './modules/orders/orders.controller';
+import { OrdersService } from './modules/orders/orders.service';
+import { ProductAttributeValuesModule } from './modules/product-attribute-values/product-attribute-values.module';
+import { QuantityConfigsModule } from './modules/quantity_configs/quantity_configs.module';
+import { ProductImagesModule } from './modules/product_images/product_images.module';
 
 @Module({
   imports: [
@@ -43,8 +49,12 @@ import { PrescriptionsModule } from './modules/prescriptions/prescriptions.modul
     ProductEnumAttributeOptionsModule,
     CloudinaryModule,
     PrescriptionsModule,
+    OrdersModule,
+    ProductAttributeValuesModule,
+    QuantityConfigsModule,
+    ProductImagesModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, OrdersController],
+  providers: [AppService, OrdersService],
 })
 export class AppModule { }

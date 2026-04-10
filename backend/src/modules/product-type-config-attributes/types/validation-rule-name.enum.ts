@@ -22,8 +22,8 @@ export enum ValidationRuleName {
     MIN_DATE = "min_date",
     MAX_DATE = "max_date",
     IS_DEFAULT_DATE_TODAY = "is_default_date_today",
-    RANGE_FROM_TODAY = "range_from_today",
-    RANGE_TO_TODAY = "range_to_today",
+    MAX_DAY_PAST = "max_day_past",
+    MAX_DAY_FUTURE = "max_day_future",
     // Enum
     MIN_OPTIONS = "min_options",
     MAX_OPTIONS = "max_options",

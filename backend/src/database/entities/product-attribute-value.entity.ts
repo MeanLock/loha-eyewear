@@ -25,19 +25,19 @@ export class ProductAttributeValue {
   attribute_id: string;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
-  value_string: string;
+  value_string: string | null;
 
   @Column({ type: 'decimal', precision: 12, scale: 4, nullable: true })
-  value_number: number;
+  value_number: number | null;
 
   @Column({ type: 'boolean', nullable: true })
-  value_boolean: boolean;
+  value_boolean: boolean | null;
 
   @Column({ type: 'date', nullable: true })
-  value_date: Date;
+  value_date: Date | null;
 
   @Column({ type: 'uuid', nullable: true })
-  value_enum_option_id: string;
+  value_enum_option_id: string | null;
 
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;

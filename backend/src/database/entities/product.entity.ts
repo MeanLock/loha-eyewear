@@ -66,6 +66,9 @@ export class Product {
   @Column({ type: 'jsonb', nullable: true })
   meta_data: Record<string, any>;
 
+  @Column({ type: 'uuid', nullable: true })
+  parent_id: string;
+
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 
@@ -97,4 +100,11 @@ export class Product {
 
   @OneToOne(() => LensDetail, (l) => l.product)
   lens_detail: LensDetail;
+
+  @ManyToOne(() => Product, (p) => p.variants)
+  @JoinColumn({ name: 'parent_id' })
+  parent: Product;
+
+  @OneToMany(() => Product, (p) => p.parent)
+  variants: Product[];
 }

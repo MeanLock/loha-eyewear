@@ -1,30 +1,23 @@
-"use client";
+"use-client";
+import { Button } from "@/components/ui/button";
+import { EyeFinalPrescript, EyePrescript } from "@/types/prescription.type";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import MeasurementRow from "./components/MesurementRow";
 
 const SOCKET_SERVER_URL = "http://localhost:5000";
 
-type EyeDetail = { sph: number; cyl: number; axis: number };
-type EyePrescript = {
-  id: string;
-  time: string;
-  pd: number;
-  right_eye: {
-    vd: number;
-    first_time: EyeDetail;
-    second_time: EyeDetail;
-    avg: EyeDetail;
-  };
-  left_eye: {
-    vd: number;
-    first_time: EyeDetail;
-    second_time: EyeDetail;
-    avg: EyeDetail;
-  };
-};
+export default function CreatePrescriptionOrderPage() {
+  const [dataInputMode, setDataInputMode] = useState<"Automation" | "Manual">(
+    "Automation",
+  );
 
-export default function CreateOrderPage() {
   const [data, setData] = useState<EyePrescript | null>(null);
+
+  const [finalPrescript, setFinalPrescript] =
+    useState<EyeFinalPrescript | null>(null);
+
+  const [customer, setCustomer] = useState<any>(null);
 
   useEffect(() => {
     const socket = io(SOCKET_SERVER_URL, { transports: ["websocket"] });
@@ -43,35 +36,13 @@ export default function CreateOrderPage() {
         <p className="text-slate-400 font-medium tracking-tight">
           Đang đợi tín hiệu từ máy đo Tomey...
         </p>
+        <div>
+          <Button onClick={() => setDataInputMode("Manual")}>
+            Nhập thủ công
+          </Button>
+        </div>
       </div>
     );
-
-  const MeasurementRow = ({
-    label,
-    detail,
-    isAvg = false,
-  }: {
-    label: string;
-    detail: EyeDetail;
-    isAvg?: boolean;
-  }) => (
-    <div
-      className={`grid grid-cols-4 py-3 px-4 ${isAvg ? "bg-slate-900 text-white rounded-xl my-1" : "border-b border-slate-100 text-slate-600"}`}
-    >
-      <span
-        className={`text-xs font-bold uppercase self-center ${isAvg ? "text-blue-400" : "text-slate-400"}`}
-      >
-        {label}
-      </span>
-      <span className="text-center font-mono text-lg">
-        {detail.sph > 0 ? `+${detail.sph.toFixed(2)}` : detail.sph.toFixed(2)}
-      </span>
-      <span className="text-center font-mono text-lg">
-        {detail.cyl > 0 ? `+${detail.cyl.toFixed(2)}` : detail.cyl.toFixed(2)}
-      </span>
-      <span className="text-center font-mono text-lg">{detail.axis}°</span>
-    </div>
-  );
 
   return (
     <div className="max-w-5xl mx-auto mt-12 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[32px] overflow-hidden border border-slate-300">

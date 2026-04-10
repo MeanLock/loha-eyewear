@@ -44,6 +44,14 @@ export class ProductsController {
         return await this.productsService.findOne(id);
     }
 
+    @Get('parents/:productTypeId')
+    @ApiOperation({ summary: 'Lấy danh sách sản phẩm cha' })
+    @ApiParam({ name: 'productTypeId', description: 'UUID của loại sản phẩm' })
+    @ApiEnvelopeResponse({ type: ProductResponseDto, isArray: true })
+    async findParents(@Param('productTypeId') productTypeId: string) {
+        return await this.productsService.findParents(productTypeId);
+    }
+
     @Patch(':id')
     @ApiOperation({ summary: 'Cập nhật thông tin sản phẩm' })
     @ApiParam({ name: 'id', description: 'UUID của sản phẩm' })

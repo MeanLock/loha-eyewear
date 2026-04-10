@@ -9,6 +9,7 @@ import {
   Index,
 } from 'typeorm';
 import { AccountRole } from '../enums';
+import { EyePrescription } from './eye-prescription.entity';
 
 @Entity('accounts')
 export class Account {
@@ -69,4 +70,8 @@ export class Account {
 
   @DeleteDateColumn({ type: 'timestamptz', nullable: true })
   deleted_at: Date;
+
+  // Relationship Configuration
+  @OneToMany(() => EyePrescription, (prescription) => prescription.customer)
+  prescriptions: EyePrescription[];
 }

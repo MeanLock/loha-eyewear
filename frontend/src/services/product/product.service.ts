@@ -1,0 +1,34 @@
+import { apiClient } from "../api-client";
+
+export const ProductService = {
+  // Hàm core để upload, nhận thêm directory
+  async uploadToCloudinary(
+    file: File,
+    directory: string = "general",
+  ): Promise<{ secure_url: string; public_id: string }> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", directory); // Gửi folder mong muốn lên API
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Upload ảnh thất bại");
+    }
+
+    const data = await response.json();
+    return {
+      secure_url: data.secure_url,
+      public_id: data.public_id,
+    };
+  },
+
+  async findParentProductsByType(productTypeId: string) {
+    const response = await apiClient.get(`/products/parents/${productTypeId}`);
+    return response.data;
+  },
+};

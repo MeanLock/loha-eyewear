@@ -7,6 +7,7 @@ import {
     IsUUID,
     ValidateNested,
     IsDateString,
+    IsPhoneNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -72,7 +73,7 @@ class RawDataDto {
 }
 
 // ── Final Rx sub-DTOs (khớp "final_prescription" từ FE) ──
-// LƯU Ý: dùng "axs" (KHÔNG phải "axis")
+// LƯU Ý: dùng "axis" (KHÔNG phải "axis")
 
 class FinalEyeRxDto {
     @ApiProperty({ example: -2.0 })
@@ -87,9 +88,9 @@ class FinalEyeRxDto {
     @IsNumber()
     add: number = 0;
 
-    @ApiProperty({ example: 180, description: 'Trục (dùng "axs", KHÔNG phải "axis")' })
+    @ApiProperty({ example: 180, description: 'Trục (dùng "axis", KHÔNG phải "axis")' })
     @IsNumber()
-    axs: number;
+    axis: number;
 }
 
 class FinalRxDto {
@@ -110,6 +111,7 @@ export class CreateEyePrescriptionDto {
     @ApiProperty({ description: 'Số điện thoại khách hàng', example: '0901234567' })
     @IsString()
     @IsNotEmpty({ message: 'Số điện thoại không được để trống' })
+    @IsPhoneNumber('VN')
     customer_phone: string;
 
     @ApiPropertyOptional({ description: 'UUID khách hàng (nếu đã có tài khoản)' })

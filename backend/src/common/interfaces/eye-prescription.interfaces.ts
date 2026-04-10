@@ -43,7 +43,7 @@ export interface FinalEyeRx {
     sph: number;
     cyl: number;
     add: number; // mặc định = 0
-    axs: number;
+    axis: number;
 }
 
 /**

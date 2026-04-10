@@ -24,7 +24,7 @@ export class ProductTypeConfigAttribute {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Column({type: "varchar", length: 50})
+  @Column({ type: "varchar", length: 50 })
   key: string;
 
   @Column({ type: 'varchar', length: 20 })

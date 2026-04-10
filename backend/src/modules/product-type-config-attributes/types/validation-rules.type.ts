@@ -23,8 +23,8 @@ export type ValidationRules = Partial<{
     [ValidationRuleName.MIN_DATE]: string;
     [ValidationRuleName.MAX_DATE]: string;
     [ValidationRuleName.IS_DEFAULT_DATE_TODAY]: boolean;
-    [ValidationRuleName.RANGE_FROM_TODAY]: number;
-    [ValidationRuleName.RANGE_TO_TODAY]: number;
+    [ValidationRuleName.MAX_DAY_PAST]: number;
+    [ValidationRuleName.MAX_DAY_FUTURE]: number;
 
     // Enum
     [ValidationRuleName.MIN_OPTIONS]: number;

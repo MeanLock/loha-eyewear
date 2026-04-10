@@ -13,6 +13,12 @@ export class UserInfoDto {
 
     @ApiProperty({ enum: AccountRole, example: 'admin' })
     role: string;
+
+    @ApiProperty({ example: '0123456789' })
+    phone: string;
+
+    @ApiProperty({ example: '1995-05-20T00:00:00.000Z' })
+    dob: string;
 }
 
 export class LoginDataDto {

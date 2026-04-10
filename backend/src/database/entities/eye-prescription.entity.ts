@@ -49,7 +49,7 @@ export class EyePrescription {
     updated_at: Date;
 
     // ── Relations ──
-    @ManyToOne(() => Account)
+    @ManyToOne(() => Account, (account) => account.prescriptions)
     @JoinColumn({ name: 'customer_id' })
     customer: Account;
 }
