@@ -6,7 +6,7 @@ export const quantityConfigsSchema = z
     z.object({
       unit_name: z.string().min(1, "Tên đơn vị không được để trống"),
       is_base_unit: z.boolean().default(false),
-      conversion_rate: z.number().min(0, "Tỷ lệ quy đổi không được âm"),
+      conversion_factor: z.number().min(0, "Tỷ lệ quy đổi không được âm"),
       is_integer_only: z.boolean().default(false),
     }),
   )

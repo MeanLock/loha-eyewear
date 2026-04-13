@@ -14,8 +14,8 @@ import { ProductResponseDto } from './dto/product-response.dto';
 
 
 @ApiTags('Products') // Gom nhóm API trên Swagger
-@ApiBearerAuth('JWT-auth') // Đánh dấu cần token
-@UseGuards(JwtAuthGuard, RolesGuard) // Áp dụng check token và roles
+// @ApiBearerAuth('JWT-auth') // Đánh dấu cần token
+// @UseGuards(JwtAuthGuard, RolesGuard) // Áp dụng check token và roles
 @Controller('products')
 export class ProductsController {
     constructor(private readonly productsService: ProductsService) { }

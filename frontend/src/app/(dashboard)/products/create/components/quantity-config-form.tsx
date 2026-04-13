@@ -13,7 +13,7 @@ export function QuantityConfigForm({ form }: { form: UseFormReturn<any> }) {
   const handleSetBase = (index: number) => {
     fields.forEach((_, i) => {
       setValue(`quantity_configs.${i}.is_base_unit`, i === index);
-      if (i === index) setValue(`quantity_configs.${i}.conversion_rate`, 1); // Đơn vị gốc rate luôn là 1
+      if (i === index) setValue(`quantity_configs.${i}.conversion_factor`, 1); // Đơn vị gốc rate luôn là 1
     });
   };
 
@@ -21,7 +21,7 @@ export function QuantityConfigForm({ form }: { form: UseFormReturn<any> }) {
     <div className="space-y-4 border p-4 rounded-lg bg-blue-50/20">
       <div className="flex justify-between items-center">
         <h3 className="font-bold">Cấu hình đơn vị & Quy đổi</h3>
-        <Button type="button" variant="outline" size="sm" onClick={() => append({ unit_name: "", is_base_unit: fields.length === 0, conversion_rate: 1, is_integer_only: true })}>
+        <Button type="button" variant="outline" size="sm" onClick={() => append({ unit_name: "", is_base_unit: fields.length === 0, conversion_factor: 1, is_integer_only: true })}>
           <PlusCircle className="w-4 h-4 mr-2" /> Thêm đơn vị
         </Button>
       </div>
@@ -37,7 +37,7 @@ export function QuantityConfigForm({ form }: { form: UseFormReturn<any> }) {
                 type="number" 
                 step="any"
                 disabled={watch(`quantity_configs.${index}.is_base_unit`)}
-                {...register(`quantity_configs.${index}.conversion_rate`, { valueAsNumber: true })} 
+                {...register(`quantity_configs.${index}.conversion_factor`, { valueAsNumber: true })} 
                 placeholder="Rate"
               />
             </div>

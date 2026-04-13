@@ -8,14 +8,18 @@ export const getFinalSchema = (dynamicSchema: z.ZodObject<any>) => {
     .object({
       name: z.string().min(1, "Tên không được để trống"),
       description: z.string().min(1, "Mô tả không được để trống"),
-      image_url: z.string().url("URL không hợp lệ"),
+      image_url: z.string(),
       listed_price: z.number().min(0, "Giá niêm yết không được âm"),
       minimum_price: z.number().min(0, "Giá tối thiểu không được âm"),
       price_after_tax: z.boolean().default(false),
       min_order_range_count: z.number().int().min(1).default(1),
       is_expirable: z.boolean().default(false),
       minimum_saleable_range_count: z.number().int().min(0).default(0),
-      parent_id: z.uuid().nullable(), // Thêm trường parent_id để liên kết sản phẩm con với sản phẩm cha
+      parent_id: z
+        .string()
+        .nullable()
+        .optional()
+        .transform((val) => (val === "" ? null : val)), // Chuyển "" thành null khi không chọn
       // Thay thế z.record bằng dynamicSchema truyền vào
       attribute_values: dynamicSchema,
       product_images: productImagesSchema,

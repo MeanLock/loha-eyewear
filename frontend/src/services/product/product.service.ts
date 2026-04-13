@@ -31,4 +31,9 @@ export const ProductService = {
     const response = await apiClient.get(`/products/parents/${productTypeId}`);
     return response.data;
   },
+
+  async createProduct(payload: any) {
+    const response = await apiClient.post(`/products`, payload);
+    return response.data;
+  },
 };

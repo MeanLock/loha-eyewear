@@ -4,11 +4,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from '../../common/dtos/pagination.dto';
 import { DataSource, IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from '../../database/entities';
+import { Product, ProductAttributeValue, ProductImage, ProductQuantityConfig } from '../../database/entities';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { ProductAttributeValuesService } from '../product-attribute-values/product-attribute-values.service';
-import { QuantityConfigsService } from '../quantity_configs/quantity_configs.service';
-import { ProductImagesService } from '../product_images/product_images.service';
 import { createTranslator } from 'short-uuid';
 
 @Injectable()
@@ -17,12 +14,14 @@ export class ProductsService {
         @InjectRepository(Product) private productRepo: Repository<Product>,
         private readonly dataSource: DataSource,
         private readonly cloudinaryService: CloudinaryService,
-        private readonly productAttributeValueService: ProductAttributeValuesService,
-        private readonly quantityConfigService: QuantityConfigsService,
-        private readonly productImageService: ProductImagesService
     ) { }
 
     async create(data: CreateProductDto) {
+        console.log("Bắt đầu tạo sản phẩm");
+        console.log("Bắt đầu tạo sản phẩm");
+        console.log("Bắt đầu tạo sản phẩm");
+        console.log("Bắt đầu tạo sản phẩm");
+        console.log("Bắt đầu tạo sản phẩm")
         return await this.dataSource.transaction(async (manager) => {
             // B1: Tạo formattedMetaData - flat object để lưu JSONB trong Postgres
             const formattedMetaData = data.attribute_values.reduce((acc, item) => {
@@ -58,50 +57,69 @@ export class ProductsService {
 
             // B5: Cập nhật lại image_url của sản phẩm cho chuẩn + gom chung với code update
             const newPublicId = `products/${data.product_type.prefix}/${savedProduct.id}/main`;
-            const oldPublicId = this.cloudinaryService.extractPublicId(data.image_url);
-            await this.cloudinaryService.renameImage(oldPublicId as string, newPublicId);
+            // data.image_url đã là public_id (frontend gửi lên), dùng thẳng
+            await this.cloudinaryService.renameImage(data.image_url, newPublicId);
 
             // Gom 2 lần update thành 1: cập nhật code và image_url cùng lúc
             await manager.update(Product, savedProduct.id, { image_url: newPublicId, code: skuCode });
 
-            // B6: Lưu lại các product attribute values
-            const productAttributeValues = data.attribute_values.map((item) => ({
-                product_id: savedProduct.id,
-                attribute_id: item.attribute.id,
-                value_string: item.attribute.data_type === 'string' ? item.value as string : null,
-                value_number: item.attribute.data_type === 'number' ? item.value as number : null,
-                value_boolean: item.attribute.data_type === 'boolean' ? item.value as boolean : null,
-                value_date: item.attribute.data_type === 'date' ? new Date(item.value as string) : null,
-                value_enum_option_id: item.attribute.data_type === 'enum' ? item.value as string : null,
-            }));
-            await this.productAttributeValueService.createMany({ attribute_values: productAttributeValues });
+            // B6: Lưu lại các product attribute values (dùng manager để nằm trong cùng transaction)
+            const attributeValueEntities = data.attribute_values.flatMap((item) => {
+                // Enum có thể chọn nhiều option → flatten ra nhiều row, 1 row per option
+                if (item.attribute.data_type === 'enum') {
+                    const selectedIds = Array.isArray(item.value) ? item.value as string[] : [item.value as string];
+                    return selectedIds
+                        .filter(id => !!id) // Không lưu empty string
+                        .map(optionId => manager.create(ProductAttributeValue, {
+                            product_id: savedProduct.id,
+                            attribute_id: item.attribute.id,
+                            value_enum_option_id: optionId,
+                        }));
+                }
+                return [manager.create(ProductAttributeValue, {
+                    product_id: savedProduct.id,
+                    attribute_id: item.attribute.id,
+                    value_string: item.attribute.data_type === 'string' ? item.value as string || null : null,
+                    value_number: item.attribute.data_type === 'number' ? item.value as number : null,
+                    value_boolean: item.attribute.data_type === 'boolean' ? item.value as boolean : null,
+                    value_date: item.attribute.data_type === 'date' ? new Date(item.value as string) : null,
+                })];
+            });
+            if (attributeValueEntities.length > 0) {
+                await manager.save(ProductAttributeValue, attributeValueEntities);
+            }
 
-            // B7: Lưu lại các product quantity configs
-            const productQuantityConfigs = data.quantity_configs.map((item) => ({
-                product_id: savedProduct.id,
-                unit_name: item.unit_name,
-                is_base_unit: item.is_base_unit,
-                conversion_factor: item.conversion_factor,
-                is_integer_only: item.is_integer_only
-            }));
-            await this.quantityConfigService.createMany({ quantity_configs: productQuantityConfigs });
+            // B7: Lưu lại các product quantity configs (dùng manager)
+            if (data.quantity_configs.length > 0) {
+                const quantityConfigEntities = data.quantity_configs.map((item) =>
+                    manager.create(ProductQuantityConfig, {
+                        product_id: savedProduct.id,
+                        unit_name: item.unit_name,
+                        is_base_unit: item.is_base_unit,
+                        conversion_factor: item.conversion_factor,
+                        is_integer_only: item.is_integer_only,
+                    })
+                );
+                await manager.save(ProductQuantityConfig, quantityConfigEntities);
+            }
 
             // B8: Lưu các product_images, rename từng ảnh sang đúng path (mỗi ảnh có public ID riêng)
-            const productImages = await Promise.all(
-                data.product_images.map(async (item, index) => {
-                    const imagePublicId = `products/${data.product_type.prefix}/${savedProduct.id}/gallery-${index}`;
-                    const oldImagePublicId = this.cloudinaryService.extractPublicId(item.image_url);
-                    const result = await this.cloudinaryService.renameImage(oldImagePublicId as string, imagePublicId);
-
-                    return {
-                        product_id: savedProduct.id,
-                        image_url: result,
-                        sort_order: item.sort_order,
-                        is_primary: item.is_primary
-                    };
-                })
-            );
-            await this.productImageService.createMany({ product_images: productImages });
+            if (data.product_images.length > 0) {
+                const productImageEntities = await Promise.all(
+                    data.product_images.map(async (item, index) => {
+                        const imagePublicId = `products/${data.product_type.prefix}/${savedProduct.id}/gallery-${index}`;
+                        // item.image_url đã là public_id (frontend gửi lên), dùng thẳng
+                        const renamedUrl = await this.cloudinaryService.renameImage(item.image_url, imagePublicId);
+                        return manager.create(ProductImage, {
+                            product_id: savedProduct.id,
+                            image_url: renamedUrl,
+                            sort_order: item.sort_order,
+                            is_primary: item.is_primary,
+                        });
+                    })
+                );
+                await manager.save(ProductImage, productImageEntities);
+            }
 
             // Trả về product đã được cập nhật đầy đủ (code và image_url mới)
             return { ...savedProduct, code: skuCode, image_url: newPublicId };

@@ -1,0 +1,85 @@
+@media print {
+  @page {
+    size: 70mm 50mm;
+    margin: 0;
+  }
+  .label-page {
+    page-break-after: always;
+    display: block !important;
+  }
+}
+
+.label-page {
+  width: 70mm;
+  height: 50mm;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  -webkit-print-color-adjust: exact;
+}
+
+.printable-area {
+  width: 45mm;
+  height: 15mm;
+  display: flex;
+  overflow: hidden; /* Tránh tràn nội dung */
+}
+
+.label-section {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rotate-content {
+  transform: rotate(90deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Ép nội dung không được xuống dòng */
+  white-space: nowrap;
+  width: 45mm; /* Chiều dài mặt tem */
+}
+
+.store-name {
+  font-size: 9pt; /* Giảm size xuống chút cho chắc */
+  font-weight: bold;
+  margin: 0;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
+}
+
+.product-desc {
+  font-size: 6pt;
+  margin: 0;
+  /* Giới hạn độ dài để không đè lên cái khác */
+  max-width: 40mm;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barcode-id {
+  font-size: 6pt;
+  font-family: monospace;
+}
+
+.price-box {
+  margin-top: 1mm;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.price-value {
+  font-weight: bold;
+  font-size: 11pt;
+}
+
+/* Ép Barcode nhỏ lại để không chiếm diện tích */
+svg {
+  max-width: 38mm;
+  height: auto;
+}

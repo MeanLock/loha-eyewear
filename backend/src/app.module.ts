@@ -18,6 +18,7 @@ import { OrdersService } from './modules/orders/orders.service';
 import { ProductAttributeValuesModule } from './modules/product-attribute-values/product-attribute-values.module';
 import { QuantityConfigsModule } from './modules/quantity_configs/quantity_configs.module';
 import { ProductImagesModule } from './modules/product_images/product_images.module';
+import { PrintingModule } from './modules/printing/printing.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ProductImagesModule } from './modules/product_images/product_images.mod
     ProductAttributeValuesModule,
     QuantityConfigsModule,
     ProductImagesModule,
+    PrintingModule,
   ],
   controllers: [AppController, OrdersController],
   providers: [AppService, OrdersService],

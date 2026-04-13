@@ -1,23 +1,24 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ProductTypeService } from "@/services/product-types/product-type.service";
 import { AttributeFields } from "./components/attribute-fields"; // Đảm bảo đúng path
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useEffect, useMemo, useState } from "react";
 import { generateAttributeSchema } from "./components/dynamic-schema";
 import { getFinalSchema } from "./components/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { ProductType } from "@/types/product-type.type";
 import { GeneralInformation } from "./components/general-info-form";
 import { ProductService } from "@/services/product/product.service";
 import { ProductImages } from "./components/product-images";
 import { QuantityConfigForm } from "./components/quantity-config-form";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function CreateProductPage() {
+  const router = useRouter();
   const [selectedProductTypeId, setSelectedProductTypeId] = useState<
     string | null
   >(null);
@@ -121,6 +122,19 @@ export default function CreateProductPage() {
     }
   }, [typeDetail, form]);
 
+  // --- MUTATION ---
+  const createMutation = useMutation({
+    mutationFn: (payload: any) => ProductService.createProduct(payload),
+    onSuccess: () => {
+      toast.success("Tạo sản phẩm thành công!");
+      router.push("/products");
+    },
+    onError: (err: any) => {
+      const message = err?.response?.data?.message ?? "Tạo sản phẩm thất bại";
+      toast.error(message);
+    },
+  });
+
   // --- HANDLERS ---
   const onProductTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedProductTypeId(e.target.value || null);
@@ -129,7 +143,7 @@ export default function CreateProductPage() {
   const onSubmit = async (values: any) => {
     if (!typeDetail) return;
 
-    // Transform dữ liệu theo Mục 5 & 6
+    // Transform attribute_values thành format mảng mà backend expect
     const formattedAttributes = typeDetail.config_attributes.map((attr) => ({
       attribute: {
         id: attr.id,
@@ -138,29 +152,40 @@ export default function CreateProductPage() {
         data_type: attr.data_type,
         sort_order: attr.sort_order,
       },
-      value: values.attribute_values[attr.key], // Lấy giá trị động từ form
+      value: values.attribute_values[attr.key],
     }));
+    // Lọc sạch mảng ảnh phụ, chỉ giữ lại những gì Backend cần
+    const cleanProductImages =
+      values.product_images?.map((img: any) => ({
+        sort_order: img.sort_order,
+        image_url: img.image_url, // Đây chính là public_id
+        is_primary: img.is_primary,
+      })) || [];
 
     const finalPayload = {
       ...values,
       product_type: {
         id: typeDetail.id,
         name: typeDetail.name,
-        prefix: (typeDetail as any).prefix || "PROD",
+        prefix: typeDetail.prefix,
       },
       status_id: 1,
       attribute_values: formattedAttributes,
-      product_images: [], // Cần bổ sung UI để lấy data này
-      quantity_configs: [], // Cần bổ sung UI để lấy data này
+      // product_images và quantity_configs đã được form.register qua useFieldArray
+      product_images: cleanProductImages, // Gửi bản đã lọc sạch
+      quantity_configs: values.quantity_configs ?? [],
     };
 
-    console.log(">>> Gửi Backend: ", finalPayload);
+    createMutation.mutate(finalPayload);
+    console.log("Final Payload to submit:", finalPayload);
   };
 
   return (
     <div className="w-full mx-auto p-2">
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, (errors) => {
+          console.log("Validation Errors:", errors); // Nó sẽ in ra lý do tại sao không submit được
+        })}
         className="space-y-6 bg-white p-2"
       >
         <h1 className="text-4xl font-bold text-primary">Tạo Sản Phẩm Mới</h1>
@@ -257,8 +282,12 @@ export default function CreateProductPage() {
         {/* Upload thêm các ảnh product-images khác */}
 
         {/* Cấu hình số lượng */}
-        <Button type="submit" className="w-full py-6 text-lg">
-          Tạo Sản Phẩm
+        <Button
+          type="submit"
+          className="w-full py-6 text-lg"
+          disabled={createMutation.isPending}
+        >
+          {createMutation.isPending ? "Đang tạo..." : "Tạo Sản Phẩm"}
         </Button>
       </form>
     </div>

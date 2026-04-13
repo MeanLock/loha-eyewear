@@ -13,7 +13,6 @@ import { ProductTypeConfigAttribute } from './product-type-config-attribute.enti
 import { ProductEnumAttributeOption } from './product-enum-attribute-option.entity';
 
 @Entity('product_attribute_values')
-@Unique(['product_id', 'attribute_id'])
 export class ProductAttributeValue {
   @PrimaryGeneratedColumn('uuid')
   id: string;
