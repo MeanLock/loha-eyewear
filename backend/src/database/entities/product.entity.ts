@@ -78,6 +78,10 @@ export class Product {
   @DeleteDateColumn({ type: 'timestamptz', nullable: true })
   deleted_at: Date;
 
+  total_available_quantity?: number;
+  total_shipments?: number;
+  total_expired_quantity?: number;
+
   @ManyToOne(() => ProductType, (t) => t.products)
   @JoinColumn({ name: 'product_type_id' })
   product_type: ProductType;

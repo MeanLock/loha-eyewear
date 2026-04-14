@@ -9,5 +9,6 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
   imports: [TypeOrmModule.forFeature([ProductType]), CloudinaryModule],
   controllers: [ProductTypesController],
   providers: [ProductTypesService],
+  exports: [ProductTypesService], // Export service để có thể sử dụng trong ProductsModule
 })
-export class ProductTypesModule { }
+export class ProductTypesModule {}

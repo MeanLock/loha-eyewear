@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
+import appConfig from './config/app.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './modules/products/products.module';
@@ -24,7 +25,7 @@ import { PrintingModule } from './modules/printing/printing.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig],
+      load: [databaseConfig, appConfig],
       envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
@@ -59,4 +60,4 @@ import { PrintingModule } from './modules/printing/printing.module';
   controllers: [AppController, OrdersController],
   providers: [AppService, OrdersService],
 })
-export class AppModule { }
+export class AppModule {}

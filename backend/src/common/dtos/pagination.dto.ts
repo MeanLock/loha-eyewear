@@ -4,7 +4,7 @@ import { IsInt, IsOptional, Max, Min } from 'class-validator';
 
 export class PaginationDto {
     @ApiPropertyOptional({
-        description: 'Vị trí bắt đầu lấy dữ liệu',
+        description: 'Số trang (bắt đầu từ 0)',
         minimum: 0,
         default: 0,
     })
@@ -12,7 +12,7 @@ export class PaginationDto {
     @Type(() => Number)
     @IsInt()
     @Min(0)
-    offset?: number = 0;
+    page: number = 0;
 
     @ApiPropertyOptional({
         description: 'Số lượng dữ liệu tối đa mỗi trang',
