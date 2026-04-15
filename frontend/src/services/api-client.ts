@@ -1,5 +1,6 @@
 // src/services/api-client.ts
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export const apiClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -8,8 +9,18 @@ export const apiClient = axios.create({
 
 // Customization: Xử lý Request (Gắn token)
 apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem("auth_token"); // Hoặc lấy từ cookie
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (typeof window === "undefined") return config;
+
+    // Ưu tiên cookie vì auth store đang lưu access_token vào cookie.
+    const tokenFromCookie = Cookies.get("access_token");
+    const tokenFromLocalStorage = localStorage.getItem("auth_token");
+    const token = tokenFromCookie || tokenFromLocalStorage;
+
+    if (token) {
+        config.headers = config.headers ?? {};
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
     return config;
 });
 

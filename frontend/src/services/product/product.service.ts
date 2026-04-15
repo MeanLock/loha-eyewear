@@ -1,4 +1,10 @@
+import { ProductParams, ProductsResponse } from "@/types/product.type";
 import { apiClient } from "../api-client";
+
+const unwrapData = <T>(response: unknown): T =>
+  response && typeof response === "object" && "data" in response
+    ? (response.data as T)
+    : (response as T);
 
 export const ProductService = {
   // Hàm core để upload, nhận thêm directory
@@ -29,11 +35,16 @@ export const ProductService = {
 
   async findParentProductsByType(productTypeId: string) {
     const response = await apiClient.get(`/products/parents/${productTypeId}`);
-    return response.data;
+    return unwrapData(response);
   },
 
-  async createProduct(payload: any) {
+  async createProduct(payload: unknown) {
     const response = await apiClient.post(`/products`, payload);
-    return response.data;
+    return unwrapData(response);
+  },
+
+  async getProducts(params: ProductParams): Promise<ProductsResponse> {
+    const response = await apiClient.get(`/products`, { params });
+    return unwrapData<ProductsResponse>(response);
   },
 };

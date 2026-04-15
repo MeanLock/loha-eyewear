@@ -30,6 +30,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { AccountRole } from '../../database/enums/account-role.enum';
 import { ApiEnvelopeResponse } from '../../common/decorators/swagger.decorator';
 import { ProductResponseDto } from './dto/product-response.dto';
+import { QueryProductsDto } from './dto/query-product.dto';
 
 @ApiTags('Products') // Gom nhóm API trên Swagger
 // @ApiBearerAuth('JWT-auth') // Đánh dấu cần token
@@ -59,9 +60,9 @@ export class ProductsController {
     isArray: true,
     isPaginated: true,
   })
-  async findAll(@Query() pagination: PaginationDto) {
-    // Trả về { data, meta } để TransformInterceptor tự bọc thành Envelope
-    return await this.productsService.findAll(pagination);
+  @Get()
+  async findAll(@Query() query: QueryProductsDto, @Req() req: any) {
+    return this.productsService.findAll(query, req.user?.role);
   }
 
   @Get('by-type/:productTypeId')

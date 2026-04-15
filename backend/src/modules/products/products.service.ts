@@ -14,8 +14,13 @@ import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { createTranslator } from 'short-uuid';
 import { ProductTypesService } from '../product-types/product-types.service';
 import { AccountRole } from 'src/database/enums';
-import { paginate, paginateRaw } from 'nestjs-typeorm-paginate';
+import {
+  IPaginationOptions,
+  paginate,
+  paginateRaw,
+} from 'nestjs-typeorm-paginate';
 import { ProductResponseDto } from './dto/product-response.dto';
+import { QueryProductsDto } from './dto/query-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -160,21 +165,170 @@ export class ProductsService {
     });
   }
 
-  async findAll(pagination: PaginationDto) {
-    // Stub
-    return {
-      data: [
-        { id: '1', code: 'SP1', name: 'Kính 1', listed_price: 1000 },
-        { id: '2', code: 'SP2', name: 'Kính 2', listed_price: 2000 },
-      ],
-      meta: {
-        totalItems: 2,
-        itemCount: 2,
-        itemsPerPage: pagination.limit,
-        totalPages: 1,
-        currentPage: pagination.page,
-      },
+  // service
+  async findAll(query: QueryProductsDto, userRole: AccountRole) {
+    const { productTypeId } = query;
+
+    if (productTypeId) {
+      await this.productTypeService.findOne(productTypeId); // validate exists
+    }
+
+    const queryBuilder = this.productRepo.createQueryBuilder('product');
+
+    // BLOCK QUERY
+    const page = query.page && query.page > 0 ? query.page : 1;
+    const limit = query.limit ? Math.min(query.limit, 100) : 10;
+
+    const baseRoute = '/products';
+    const routeQuery = new URLSearchParams();
+
+    if (query.productTypeId) {
+      routeQuery.set('productTypeId', query.productTypeId);
+    }
+
+    if (productTypeId) {
+      queryBuilder.andWhere('product.product_type_id = :productTypeId', {
+        productTypeId,
+      });
+    }
+
+    switch (userRole) {
+      case AccountRole.CUSTOMER:
+        // Khách hàng chỉ thấy sản phẩm có status_id = 2 (đang bán)
+        queryBuilder.andWhere('product.status_id = :statusId', { statusId: 2 });
+        break;
+      case AccountRole.SALE_STAFF:
+        // Nhân viên bán hàng thấy sản phẩm có status_id IN (1, 2) (đang bán và ngừng bán)
+        queryBuilder.andWhere('product.status_id IN (:...statusIds)', {
+          statusIds: [1, 2],
+        });
+        break;
+      case AccountRole.MANAGER:
+        // Quản lý thấy tất cả sản phẩm, không cần thêm điều kiện
+        break;
+      case AccountRole.ADMIN:
+        break;
+      default:
+        // Guest hoặc role không xác định, chỉ thấy sản phẩm có status_id = 2 (đang bán)
+        queryBuilder.andWhere('product.status_id = :statusId', { statusId: 2 });
+        break;
+    }
+
+    // Lọc và thêm các thông số cho phù hợp với yêu cầu
+    // Đầu tiên là các thông số có sẵn trong bảng product
+    queryBuilder.select([
+      'product.id',
+      'product.code',
+      'product.name',
+      'product.image_url',
+      'product.listed_price',
+      'product.minimum_price',
+      'product.minimum_saleable_range_count',
+      'product.min_order_range_count',
+      'product.price_after_tax',
+      'product.is_expirable',
+    ]);
+
+    // Sau đó là các thông số cần tính toán từ các bảng liên quan
+    // 1. Tính tổng số lượng khả dụng (quy đổi về base unit)
+    queryBuilder.addSelect((subQuery) => {
+      return subQuery
+        .select(
+          'SUM((si.input_amount - si.sold_count - si.reserved_count) * pq.conversion_factor)',
+        )
+        .from('shipment_items', 'si') // Đúng tên bảng trong DB của ShipmentItem
+        .innerJoin(
+          'product_quantity_configs',
+          'pq',
+          'pq.id = si.quantity_config_id',
+        ) // Đúng tên bảng của ProductQuantityConfig
+        .where('si.product_id = product.id')
+        .andWhere('si.deleted_at IS NULL'); // Luôn nhớ check deleted_at vì bạn dùng soft delete
+    }, 'total_available_quantity');
+
+    // 2. Tổng số lô hàng chứa sản phẩm này
+    queryBuilder.addSelect((subQuery) => {
+      return subQuery
+        .select('COUNT(DISTINCT si.shipment_id)')
+        .from('shipment_items', 'si')
+        .where('si.product_id = product.id')
+        .andWhere('si.deleted_at IS NULL');
+    }, 'total_shipments');
+
+    // 3. Tổng số lượng đã hết hạn (chỉ tính những lô có is_expired = true hoặc expire_date < now)
+    queryBuilder.addSelect((subQuery) => {
+      return subQuery
+        .select(
+          'SUM((si.input_amount - si.sold_count - si.reserved_count) * pq.conversion_factor)',
+        )
+        .from('shipment_items', 'si')
+        .innerJoin(
+          'product_quantity_configs',
+          'pq',
+          'pq.id = si.quantity_config_id',
+        )
+        .where('si.product_id = product.id')
+        .andWhere('(si.is_expired = true OR si.expire_date < CURRENT_DATE)')
+        .andWhere('si.deleted_at IS NULL');
+    }, 'total_expired_quantity');
+
+    // Thêm phân trang
+    queryBuilder.orderBy('product.id', 'DESC'); // Sắp xếp tùy ý
+
+    // console.log('>>> QUERY BUILDER NÈ: ', queryBuilder.getSql()); // Xem câu SQL thô
+    // console.log('>>> PARAMETERS: ', queryBuilder.getParameters()); // Xem các tham số truyền vào
+    const route = routeQuery.toString()
+      ? `${baseRoute}?${routeQuery.toString()}`
+      : baseRoute;
+
+    const options: IPaginationOptions = {
+      page,
+      limit,
+      route,
     };
+
+    const result = await paginateRaw<any>(queryBuilder, options);
+    // const options = {
+    //   page: query.page, // paginate lib bắt đầu page từ 1
+    //   limit,
+    //   route: `/products?productTypeId=${productTypeId}`, // Đường dẫn gốc cho pagination links
+    // };
+
+    // const result = await paginate<any>(queryBuilder, options);
+    // const testRaw = await queryBuilder.getRawMany();
+    // console.log('Dữ liệu thô từ DB:', testRaw);
+    // result.items.forEach((item) => {
+    //   item.total_available_quantity =
+    //     Number(item.total_available_quantity) || 0;
+    //   item.total_shipments = Number(item.total_shipments) || 0;
+    //   item.total_expired_quantity = Number(item.total_expired_quantity) || 0;
+    // });
+
+    // return result;
+    // 1. Ép kiểu về any để lấy được dữ liệu thô
+    // const result = await paginateRaw<any>(queryBuilder, options);
+
+    const mappedItems = result.items.map((item) => {
+      // Khi dùng paginateRaw, tên key có thể dính prefix table hoặc nguyên bản
+      // Bạn check log lần nữa nếu key bị đổi tên (thường là "total_available_quantity")
+      return {
+        id: item.product_id, // Lưu ý: paginateRaw có thể trả về key theo dạng table_column
+        code: item.product_code,
+        name: item.product_name,
+        image_url: item.product_image_url,
+        listed_price: item.product_listed_price,
+        minimum_price: item.product_minimum_price,
+        minimum_saleable_range_count: item.product_minimum_saleable_range_count,
+        min_order_range_count: item.product_min_order_range_count,
+        price_after_tax: item.product_price_after_tax,
+        is_expirable: item.product_is_expirable,
+        total_available_quantity: Number(item.total_available_quantity || 0),
+        total_shipments: Number(item.total_shipments || 0),
+        total_expired_quantity: Number(item.total_expired_quantity || 0),
+      };
+    });
+
+    return { ...result, items: mappedItems };
   }
 
   async findOne(id: string) {

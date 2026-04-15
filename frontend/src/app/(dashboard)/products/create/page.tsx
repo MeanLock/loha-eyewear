@@ -188,7 +188,7 @@ export default function CreateProductPage() {
         })}
         className="space-y-6 bg-white p-2"
       >
-        <h1 className="text-4xl font-bold text-primary">Tạo Sản Phẩm Mới</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Tạo Sản Phẩm Mới</h1>
 
         {/* --- PHẦN 1: CƠ BẢN --- */}
         <GeneralInformation form={form} />
