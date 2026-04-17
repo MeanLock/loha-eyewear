@@ -1,5 +1,4 @@
 "use client";
-
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ProductTypeService } from "@/services/product-types/product-type.service";

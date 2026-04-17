@@ -38,3 +38,10 @@ export interface ProductParams {
   category?: string;
   productTypeId?: string;
 }
+
+export interface ParentProductOption {
+  id: string;
+  name: string;
+  sku?: string;
+  prefix?: string;
+}

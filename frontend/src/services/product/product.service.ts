@@ -1,4 +1,8 @@
-import { ProductParams, ProductsResponse } from "@/types/product.type";
+import {
+  ParentProductOption,
+  ProductParams,
+  ProductsResponse,
+} from "@/types/product.type";
 import { apiClient } from "../api-client";
 
 const unwrapData = <T>(response: unknown): T =>
@@ -33,14 +37,16 @@ export const ProductService = {
     };
   },
 
-  async findParentProductsByType(productTypeId: string) {
+  async findParentProductsByType(
+    productTypeId: string,
+  ): Promise<ParentProductOption[]> {
     const response = await apiClient.get(`/products/parents/${productTypeId}`);
-    return unwrapData(response);
+    return unwrapData<ParentProductOption[]>(response);
   },
 
-  async createProduct(payload: unknown) {
+  async createProduct(payload: unknown): Promise<unknown> {
     const response = await apiClient.post(`/products`, payload);
-    return unwrapData(response);
+    return unwrapData<unknown>(response);
   },
 
   async getProducts(params: ProductParams): Promise<ProductsResponse> {

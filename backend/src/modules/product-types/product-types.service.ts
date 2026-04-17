@@ -66,6 +66,7 @@ export class ProductTypesService {
 
     const productType = this.productTypeRepo.create({
       name: dto.name,
+      prefix: dto.prefix,
       config_attributes: dto.attributes.map(({ options, ...attr }) => ({
         ...attr,
         enum_options: options,

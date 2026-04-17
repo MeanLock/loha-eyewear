@@ -12,32 +12,6 @@ import { io } from "socket.io-client";
 // Địa chỉ của con Bridge đang chạy ở tiệm
 const SOCKET_SERVER_URL = "http://localhost:5000";
 export default function Page() {
-  //   useEffect(() => {
-  //     const socket = io("http://localhost:5000", {
-  //       transports: ["websocket"], // Ép dùng websocket cho nhanh và ổn định
-  //     });
-
-  //     socket.on("NEW_MEASUREMENT", (data) => {
-  //       alert("Alo");
-  //       console.log("Nhận data từ máy đo:", data);
-
-  //       // Hiện thông báo (Toast hoặc Confirm)
-  //       const confirmApply = window.confirm(
-  //         `Đã nhận kết quả đo ID: ${data.id}. Bạn có muốn điền vào đơn hàng không?`,
-  //       );
-
-  //       if (confirmApply) {
-  //         // Giả sử bro dùng state để quản lý Form
-  //         // setFieldValue("sph_r", data.right_eye.avg.sph);
-  //         // setFieldValue("cyl_r", data.right_eye.avg.cyl);
-  //         // ... tự động điền hết đống data vào form
-  //       }
-  //     });
-
-  //     return () => {
-  //       socket.disconnect();
-  //     };
-  //   }, []);
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
 
@@ -75,6 +49,7 @@ export default function Page() {
       password,
     });
   };
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
