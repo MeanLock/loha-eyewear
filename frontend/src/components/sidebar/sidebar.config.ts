@@ -81,18 +81,18 @@ const buildAdminNavGroups = ({
         subMenuItems: productSubMenuItems,
       },
       {
-        title: "Hóa đơn",
+        title: "Đơn Hàng",
         url: "#",
         icon: ScanEye,
         isSubMenu: true,
         subMenuItems: [
           {
-            title: "Tạo đơn kính thuốc",
-            url: "/order/eye-prescription",
+            title: "Đơn kính thuốc",
+            url: "/orders?orderTypeId=1",
           },
           {
-            title: "Tạo đơn bán lẻ",
-            url: "/order/retail",
+            title: "Đơn bán lẻ",
+            url: "/orders?orderTypeId=2",
           },
         ],
       },
